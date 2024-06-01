@@ -22,9 +22,31 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const ShadAvatar(
-              'https://app.requestly.io/delay/2000/avatars.githubusercontent.com/u/124599?v=4',
-              placeholder: Text('CN'),
+            const SizedBox(height: 40),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    ShadAvatar(
+                      'assets/avatar.svg',
+                      placeholder: Text(user.value?.username
+                          .substring(0, 2)
+                          .toUpperCase() as String),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      "Bienvenido ${user.value?.username}",
+                      style: ShadTheme.of(context).textTheme.h3,
+                    ),
+                  ],
+                ),
+                ShadButton(
+                  size: ShadButtonSize.icon,
+                  icon: ShadImage.square(size: 16, LucideIcons.settings),
+                )
+              ],
             ),
             const SizedBox(height: 16),
             Text(

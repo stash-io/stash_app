@@ -1,16 +1,34 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_solidart/flutter_solidart.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stash_app/pages/home.dart';
 import 'package:stash_app/pages/login.dart';
 import 'package:stash_app/pages/onboarding.dart';
 import 'package:stash_app/pages/register.dart';
 import 'package:stash_app/store.dart';
 
-String? goToOnboardingIfNotLoggedIn(BuildContext context, GoRouterState state) {
+Future<void> loadUserFromStorage(user) async {
+  final userEncoded = (await SharedPreferences.getInstance()).getString('user');
+  if (userEncoded == null) {
+    return;
+  }
+
+  final userDecoded = User.fromJson(jsonDecode(userEncoded));
+  user.value = userDecoded;
+}
+
+Future<String?> goToOnboardingIfNotLoggedIn(
+    BuildContext context, GoRouterState state) async {
   final user = context.get<Signal<User?>>();
   if (user.value == null) {
-    return '/onboarding';
+    await loadUserFromStorage(user);
+
+    if (user.value == null) {
+      return '/onboarding';
+    }
   }
 
   return null;

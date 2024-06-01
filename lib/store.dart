@@ -1,12 +1,26 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_solidart/flutter_solidart.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class User {
   String username;
   String email;
 
   User(this.username, this.email);
+
+  User.fromJson(Map<String, dynamic> json)
+      : username = json['username'],
+        email = json['email'];
+
+  Map<String, dynamic> toJson() {
+    return {
+      'username': username,
+      'email': email,
+    };
+  }
 }
 
 class Store extends StatelessWidget {
@@ -19,10 +33,26 @@ class Store extends StatelessWidget {
     return Solid(
       providers: [
         Provider<Signal<User?>>(
-          create: () => Signal(null),
+          create: () {
+            return Signal(null);
+          },
         ),
       ],
       builder: (context) {
+        final user = context.get<Signal<User?>>();
+
+        user.observe((previousUser, newUser) {
+          () async {
+            if (newUser == null) {
+              (await SharedPreferences.getInstance()).remove('user');
+              return;
+            }
+
+            (await SharedPreferences.getInstance())
+                .setString('user', jsonEncode(newUser));
+          }();
+        });
+
         return shadApp;
       },
     );
