@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:stash_app/components/scrollable.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -26,9 +27,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-        child: Scaffold(
-      body: Center(
+    return ScrollScreen(
+      child: Center(
         child: ShadForm(
           key: formKey,
           child: ConstrainedBox(
@@ -138,6 +138,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       ),
-    ));
+    );
   }
 }

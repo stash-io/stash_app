@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_solidart/flutter_solidart.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:stash_app/components/scrollable.dart';
 import 'package:stash_app/store.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -41,9 +42,8 @@ class _LoginScreenState extends State<LoginScreen> {
       context.go("/");
     }
 
-    return Center(
-        child: Scaffold(
-      body: Center(
+    return ScrollScreen(
+      child: Center(
         child: ShadForm(
           key: formKey,
           child: ConstrainedBox(
@@ -135,6 +135,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
-    ));
+    );
   }
 }

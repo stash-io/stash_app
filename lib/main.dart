@@ -12,6 +12,12 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Store(
-        shadApp: ShadApp.router(routerConfig: router),
+        shadApp: ShadApp.router(
+          routerConfig: router,
+          darkTheme: ShadThemeData(
+            brightness: Brightness.dark,
+            colorScheme: const ShadSlateColorScheme.dark(),
+          ),
+        ),
       );
 }

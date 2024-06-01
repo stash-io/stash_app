@@ -22,10 +22,9 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 96),
-            Text(
-              "Home",
-              style: ShadTheme.of(context).textTheme.h1,
+            const ShadAvatar(
+              'https://app.requestly.io/delay/2000/avatars.githubusercontent.com/u/124599?v=4',
+              placeholder: Text('CN'),
             ),
             const SizedBox(height: 16),
             Text(
