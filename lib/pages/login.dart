@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_solidart/flutter_solidart.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:stash_app/store.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,27 +18,29 @@ class _LoginScreenState extends State<LoginScreen> {
   var email = "";
   var password = "";
 
-  void login() {
-    if (!formKey.currentState!.saveAndValidate()) {
-      return;
-    }
-
-    const username = "Victor";
-
-    ShadToaster.of(context).show(
-      ShadToast(
-        title: const Text('Sesión iniciada correctamente.'),
-        description: const Text('Bienvenido $username!'),
-        action: ShadButton.outline(
-          text: const Text('Ok'),
-          onPressed: () => ShadToaster.of(context).hide(),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final user = context.get<Signal<User?>>();
+
+    void login() {
+      if (!formKey.currentState!.saveAndValidate()) {
+        return;
+      }
+
+      const username = "Victor";
+
+      user.value = User(username, email);
+
+      ShadToaster.of(context).show(
+        const ShadToast(
+          title: Text('Sesión iniciada correctamente.'),
+          description: Text('Bienvenido $username!'),
+        ),
+      );
+
+      context.go("/");
+    }
+
     return Center(
         child: Scaffold(
       body: Center(

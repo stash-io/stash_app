@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_solidart/flutter_solidart.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
-import 'package:stash_app/store.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
-    final user = context.get<Signal<User?>>();
-
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -24,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             const SizedBox(height: 96),
             Text(
-              "Home",
+              "Bienvenido a Stash",
               style: ShadTheme.of(context).textTheme.h1,
             ),
             const SizedBox(height: 16),
@@ -35,13 +31,16 @@ class _HomeScreenState extends State<HomeScreen> {
             const Expanded(
               child: SizedBox(height: 16),
             ),
-            ShadButton(
-              text: const Text("Cerrar sesión."),
+            ShadButton.link(
+              text: const Text("Tengo cuenta, iniciar sesión."),
               width: double.infinity,
-              onPressed: () {
-                user.value = null;
-                context.go('/login');
-              },
+              onPressed: () => context.go('/login'),
+            ),
+            const SizedBox(height: 8),
+            ShadButton(
+              text: const Text("No tengo cuenta, crear una."),
+              width: double.infinity,
+              onPressed: () => context.go('/register'),
             ),
             const SizedBox(height: 16)
           ],
