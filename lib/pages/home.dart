@@ -58,11 +58,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () => showShadDialog(
                       context: context,
                       builder: (context) => ShadDialog(
-                        title: const Text(
-                            textAlign: TextAlign.left, 'Preferencias'),
+                        title: const Text(textAlign: TextAlign.left, 'Ajustes'),
                         description: const Text(
                             textAlign: TextAlign.left,
-                            "Aquí puedes gestionar las preferecias de la aplicación."),
+                            "Aquí puedes gestionar los ajustes de la aplicación."),
                         content: Container(
                           width: 375,
                           padding: const EdgeInsets.symmetric(vertical: 20),
