@@ -65,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Inicio sesión",
+                  "Iniciar sesión",
                   style: ShadTheme.of(context).textTheme.h1,
                 ),
                 const SizedBox(height: 32),

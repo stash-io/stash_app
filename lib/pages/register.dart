@@ -55,7 +55,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Registro",
+                  "Registrarse",
                   style: ShadTheme.of(context).textTheme.h1,
                 ),
                 const SizedBox(height: 32),
@@ -69,6 +69,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   validator: (v) {
                     if (v.isEmpty) {
                       return 'Introduce un nombre de usuario.';
+                    }
+
+                    if (v.length > 20) {
+                      return 'El nombre de usuario no puede tener mas de 20 caracteres.';
                     }
 
                     return null;

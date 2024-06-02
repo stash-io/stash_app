@@ -40,6 +40,7 @@ dependencies:
   flutter_solidart: ^1.7.1
   shared_preferences: ^2.2.3
   http: ^1.2.1
+  typewritertext: ^3.0.5
 
 dev_dependencies:
   flutter_test:

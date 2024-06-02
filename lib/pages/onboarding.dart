@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:typewritertext/v3/typewriter.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -24,9 +25,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               style: ShadTheme.of(context).textTheme.h1,
             ),
             const SizedBox(height: 16),
-            Text(
+            TypeWriter.text(
               "Gestiona tu backlog de articulos, paginas web e ideas de la forma mas eficaz e intuitiva.",
               style: ShadTheme.of(context).textTheme.p,
+              duration: const Duration(milliseconds: 50),
             ),
             const Expanded(
               child: SizedBox(height: 16),

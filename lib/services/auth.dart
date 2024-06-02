@@ -27,7 +27,7 @@ Future<User> authLogin(String email, String password) async {
     throw Exception("${response.statusCode} ${response.body}");
   }
 
-  var body = jsonDecode(response.body);
+  var body = jsonDecode(utf8.decode(response.bodyBytes));
 
   var token = body['token'];
   var username = body['username'];
