@@ -35,6 +35,6 @@ jobs:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: build/app/outputs/apk/release/app-release.apk
         asset_name: stash_installer
-        tag: ${{ github.ref }}
+        tag: 'Latest installer'
         overwrite: true
         body: "Automatic release"
