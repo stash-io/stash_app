@@ -3,6 +3,7 @@ import 'package:flutter_solidart/flutter_solidart.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:stash_app/components/scrollable.dart';
+import 'package:stash_app/services/auth.dart';
 import 'package:stash_app/store.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -23,23 +24,34 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final user = context.get<Signal<User?>>();
 
-    void login() {
+    Future<void> login() async {
       if (!formKey.currentState!.saveAndValidate()) {
         return;
       }
 
-      const username = "Victor";
+      try {
+        user.value = await authLogin(email, password);
 
-      user.value = User(username, email);
+        if (mounted) {
+          ShadToaster.of(context).show(
+            ShadToast(
+              title: const Text('Sesión iniciada correctamente.'),
+              description: Text('Bienvenido ${user.value?.username}!'),
+            ),
+          );
 
-      ShadToaster.of(context).show(
-        const ShadToast(
-          title: Text('Sesión iniciada correctamente.'),
-          description: Text('Bienvenido $username!'),
-        ),
-      );
-
-      context.go("/");
+          context.go("/");
+        }
+      } catch (e) {
+        if (mounted) {
+          ShadToaster.of(context).show(
+            ShadToast(
+              title: const Text('Ha habido un error en el servidor.'),
+              description: Text(e.toString()),
+            ),
+          );
+        }
+      }
     }
 
     return ScrollScreen(

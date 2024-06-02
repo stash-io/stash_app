@@ -8,17 +8,20 @@ import 'package:shared_preferences/shared_preferences.dart';
 class User {
   String username;
   String email;
+  String token;
 
-  User(this.username, this.email);
+  User(this.username, this.email, this.token);
 
   User.fromJson(Map<String, dynamic> json)
       : username = json['username'],
-        email = json['email'];
+        email = json['email'],
+        token = json['token'];
 
   Map<String, dynamic> toJson() {
     return {
       'username': username,
       'email': email,
+      'token': token,
     };
   }
 }

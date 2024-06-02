@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:stash_app/components/scrollable.dart';
+import 'package:stash_app/services/auth.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -19,9 +20,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
   var password = "";
   var repeatPassword = "";
 
-  void register() {
+  Future<void> register() async {
     if (!formKey.currentState!.saveAndValidate()) {
       return;
+    }
+
+    try {
+      await authRegister(username, email, password);
+      if (mounted) {
+        context.go("/login");
+      }
+    } catch (e) {
+      if (mounted) {
+        ShadToaster.of(context).show(
+          ShadToast(
+            title: const Text('Ha habido un error en el servidor.'),
+            description: Text(e.toString()),
+          ),
+        );
+      }
     }
   }
 
