@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_solidart/flutter_solidart.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:stash_app/components/collections.dart';
+import 'package:stash_app/components/scrollable.dart';
 import 'package:stash_app/store.dart';
 import 'package:typewritertext/v3/typewriter.dart';
 
@@ -17,8 +19,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final user = context.get<Signal<User?>>();
 
-    return Scaffold(
-      body: Padding(
+    return ScrollScreen(
+      child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,13 +106,15 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 16),
             Text(
+              "Tus colecciones",
+              style: ShadTheme.of(context).textTheme.h2,
+            ),
+            const Collections(),
+            Text(
               "Tus links",
               style: ShadTheme.of(context).textTheme.h2,
             ),
-            const Expanded(
-              child: SizedBox(height: 16),
-            ),
-            const SizedBox(height: 16)
+            const Collections(),
           ],
         ),
       ),

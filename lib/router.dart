@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_solidart/flutter_solidart.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stash_app/pages/collection.dart';
 import 'package:stash_app/pages/home.dart';
 import 'package:stash_app/pages/login.dart';
 import 'package:stash_app/pages/onboarding.dart';
@@ -52,6 +53,11 @@ final router = GoRouter(
     GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterScreen(),
+    ),
+    GoRoute(
+      path: '/collection',
+      builder: (context, state) =>
+          CollectionScreen(id: state.uri.queryParameters['id'] as String),
     ),
   ],
 );
