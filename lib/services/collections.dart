@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
@@ -75,7 +76,8 @@ Future<List<Collection>> collectionsList(String token) async {
   );
 
   if (response.statusCode != 200) {
-    throw Exception("${response.statusCode} ${response.body}");
+    final message = "${response.statusCode} ${response.body}";
+    throw Exception(message);
   }
 
   final body = CollectionListResponse.fromJson(

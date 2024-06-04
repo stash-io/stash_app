@@ -43,10 +43,67 @@ class _CollectionsState extends State<Collections> {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return GridView.count(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
             crossAxisCount: 2,
             mainAxisSpacing: 10,
             crossAxisSpacing: 10,
-            children: const [],
+            children: [
+              AspectRatio(
+                aspectRatio: 1,
+                child: GestureDetector(
+                  child: const ShadCard(
+                    title: Padding(
+                        padding: EdgeInsets.only(bottom: 12),
+                        child: ShadImage.square(size: 16, LucideIcons.plus)),
+                    description: Text("Crear una nueva colección"),
+                  ),
+                  onTap: () => showShadDialog(
+                    context: context,
+                    builder: (context) => ShadDialog(
+                      title: const Text(
+                          textAlign: TextAlign.left, 'Nueva colección'),
+                      description: const Text(
+                          textAlign: TextAlign.left,
+                          "Introduce los datos de una nueva colección."),
+                      content: Container(
+                        width: 375,
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              ShadInputFormField(
+                                id: 'title',
+                                label: const Text('Titulo'),
+                                onChanged: (value) => setState(() {
+                                  newCollectionTitle = value;
+                                }),
+                              ),
+                              ShadInputFormField(
+                                id: 'description',
+                                label: const Text('Descripción'),
+                                onChanged: (value) => setState(() {
+                                  newCollectionDescription = value;
+                                }),
+                              ),
+                            ]),
+                      ),
+                      actions: [
+                        ShadButton.ghost(
+                          text: const Text('Cerrar'),
+                          onPressed: () => Navigator.of(context).pop(false),
+                        ),
+                        ShadButton(
+                          text: const Text("Crear"),
+                          onPressed: createNewCollection,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            ],
           );
         }
 
