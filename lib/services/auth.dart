@@ -30,9 +30,10 @@ Future<User> authLogin(String email, String password) async {
   var body = jsonDecode(utf8.decode(response.bodyBytes));
 
   var token = body['token'];
+  var id = int.parse(body['id']);
   var username = body['username'];
 
-  var user = User(username, email, token);
+  var user = User(id, username, email, token);
 
   return user;
 }

@@ -6,19 +6,22 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class User {
+  int id;
   String username;
   String email;
   String token;
 
-  User(this.username, this.email, this.token);
+  User(this.id, this.username, this.email, this.token);
 
   User.fromJson(Map<String, dynamic> json)
-      : username = json['username'],
+      : id = json['id'],
+        username = json['username'],
         email = json['email'],
         token = json['token'];
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'username': username,
       'email': email,
       'token': token,
@@ -42,6 +45,12 @@ class Store extends StatelessWidget {
         ),
       ],
       builder: (context) {
+        // SharedPreferences.getInstance().then(
+        //   (prefs) {
+        //     prefs.clear();
+        //   },
+        // );
+
         final user = context.get<Signal<User?>>();
 
         user.observe((previousUser, newUser) {

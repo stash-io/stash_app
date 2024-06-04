@@ -5,8 +5,10 @@ import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:stash_app/components/collections.dart';
 import 'package:stash_app/components/links.dart';
 import 'package:stash_app/components/scrollable.dart';
+import 'package:stash_app/config.dart';
 import 'package:stash_app/store.dart';
 import 'package:typewritertext/v3/typewriter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -34,11 +36,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(top: 16),
-                        child: ShadAvatar(
-                          'assets/avatar.svg',
-                          placeholder: Text(user.value?.username
-                              .substring(0, 2)
-                              .toUpperCase() as String),
+                        child: GestureDetector(
+                          child: ShadAvatar(
+                            'assets/avatar.svg',
+                            placeholder: Text(user.value?.username
+                                .substring(0, 2)
+                                .toUpperCase() as String),
+                          ),
+                          onTap: () {
+                            final Uri url = Uri.parse(
+                                "${config['backend_url']}/publish/links/list/user/${user.value?.id}");
+                            launchUrl(url);
+                          },
                         ),
                       ),
                       const SizedBox(width: 8),
