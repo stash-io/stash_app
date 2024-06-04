@@ -3,6 +3,7 @@ import 'package:flutter_solidart/flutter_solidart.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 import 'package:stash_app/components/collections.dart';
+import 'package:stash_app/components/links.dart';
 import 'package:stash_app/components/scrollable.dart';
 import 'package:stash_app/store.dart';
 import 'package:typewritertext/v3/typewriter.dart';
@@ -114,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
               "Tus links",
               style: ShadTheme.of(context).textTheme.h2,
             ),
-            const Collections(),
+            const Links(),
           ],
         ),
       ),
