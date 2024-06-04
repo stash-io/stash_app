@@ -59,6 +59,27 @@ Future<void> linksCreate(String token, String title, String description,
   }
 }
 
+Future<void> linksUpdate(String token, int id, String title, String description,
+    String url, bool published, int? collectionId) async {
+  var response = await http.put(
+      Uri.parse('${config['backend_url']}/api/links/$id'),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token"
+      },
+      body: json.encode({
+        "title": title,
+        "description": description,
+        "url": url,
+        "published": published,
+        "collectionId": collectionId
+      }));
+
+  if (response.statusCode != 200) {
+    throw Exception("${response.statusCode} ${response.body}");
+  }
+}
+
 class LinkListResponse {
   List<Link> links;
 
