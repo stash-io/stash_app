@@ -120,6 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
               style: ShadTheme.of(context).textTheme.h2,
             ),
             const Collections(),
+            const SizedBox(height: 18),
             Text(
               "Tus links",
               style: ShadTheme.of(context).textTheme.h2,

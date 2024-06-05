@@ -62,17 +62,18 @@ Future<void> linksCreate(String token, String title, String description,
 Future<void> linksUpdate(String token, int id, String title, String description,
     String url, bool published, int? collectionId) async {
   var response = await http.put(
-      Uri.parse('${config['backend_url']}/api/links/$id'),
+      Uri.parse('${config['backend_url']}/api/links/update'),
       headers: {
         "Content-Type": "application/json",
         "Authorization": "Bearer $token"
       },
       body: json.encode({
+        "id": id,
         "title": title,
         "description": description,
         "url": url,
         "published": published,
-        "collectionId": collectionId
+        "collectionId": collectionId == -1 ? null : collectionId
       }));
 
   if (response.statusCode != 200) {
@@ -98,6 +99,27 @@ class LinkListResponse {
 Future<List<Link>> linksList(String token) async {
   var response = await http.get(
     Uri.parse('${config['backend_url']}/api/links/list'),
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token"
+    },
+  );
+
+  if (response.statusCode != 200) {
+    final message = "${response.statusCode} ${response.body}";
+    throw Exception(message);
+  }
+
+  final body =
+      LinkListResponse.fromJson(jsonDecode(utf8.decode(response.bodyBytes)));
+
+  return body.links;
+}
+
+Future<List<Link>> linksListFilterCollectionId(
+    String token, int collectionId) async {
+  var response = await http.get(
+    Uri.parse('${config['backend_url']}/api/collections/$collectionId/links'),
     headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer $token"

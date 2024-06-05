@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_solidart/flutter_solidart.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
+import 'package:stash_app/components/links.dart';
 import 'package:stash_app/components/scrollable.dart';
 import 'package:stash_app/services/collections.dart';
 import 'package:stash_app/store.dart';
@@ -109,6 +110,10 @@ class _CollectionScreenState extends State<CollectionScreen> {
                   snapshot.data!.description,
                   style: ShadTheme.of(context).textTheme.p,
                 ),
+                const SizedBox(height: 16),
+                Links(
+                  collectionId: snapshot.data!.id,
+                )
               ],
             );
           },

@@ -12,7 +12,9 @@ import 'package:stash_app/store.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Links extends StatefulWidget {
-  const Links({super.key});
+  final int? collectionId;
+
+  const Links({super.key, this.collectionId});
 
   @override
   State<Links> createState() => _LinksState();
@@ -23,16 +25,22 @@ class _LinksState extends State<Links> {
 
   Future<List<Link>> fetchData() async {
     final user = context.get<Signal<User?>>();
+
+    if (widget.collectionId != null) {
+      return await linksListFilterCollectionId(
+          user.value!.token, widget.collectionId!);
+    }
+
     return await linksList(user.value!.token);
   }
 
-  String newLinkCollectionSearch = "";
+  String collectionsSearch = "";
   Map<String, String> collections = {};
   Map<String, String> get filteredCollections => {
         for (final collection in collections.entries)
           if (collection.value
               .toLowerCase()
-              .contains(newLinkCollectionSearch.toLowerCase()))
+              .contains(collectionsSearch.toLowerCase()))
             collection.key: collection.value
       };
 
@@ -56,6 +64,7 @@ class _LinksState extends State<Links> {
     String newLinkDescription = "";
     String newLinkUrl = "";
     bool newLinkPublished = false;
+    int? newLinkCollectionId;
 
     String editingLinkTitle = "";
     String editingLinkDescription = "";
@@ -127,6 +136,10 @@ class _LinksState extends State<Links> {
                   description: Text("Crear un nuevo link"),
                 ),
                 onTap: () async {
+                  setState(() {
+                    newLinkCollectionId = widget.collectionId;
+                  });
+
                   await loadCollections();
 
                   showShadDialog(
@@ -194,22 +207,54 @@ class _LinksState extends State<Links> {
                                       return null;
                                     },
                                   ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 2),
+                                          child: ShadSwitchFormField(
+                                            id: 'published',
+                                            label: const Text('Publicado'),
+                                            initialValue: newLinkPublished,
+                                            onChanged: (value) => setState(() {
+                                              newLinkPublished = value;
+                                            }),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 4, bottom: 4, top: 8),
+                                          child: Text(
+                                            'Colección',
+                                            style: ShadTheme.of(context)
+                                                .textTheme
+                                                .small,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                   ShadSelect<String>.withSearch(
-                                    minWidth: 180,
+                                    minWidth: 350,
                                     placeholder: const Text(
                                         'Selecciona una colección...'),
                                     onSearchChanged: (value) => setState(
-                                        () => newLinkCollectionSearch = value),
+                                        () => collectionsSearch = value),
                                     searchPlaceholder:
-                                        const Text('Search framework'),
+                                        const Text('Buscar colección'),
+                                    initialValue:
+                                        newLinkCollectionId.toString(),
                                     options: [
-                                      if (filteredCollections.isEmpty)
-                                        const Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 24),
-                                          child: Text(
-                                              'No se han encontrado resultados'),
-                                        ),
+                                      const ShadOption(
+                                          value: "-1",
+                                          child: Text("Sin colección")),
                                       ...collections.entries.map(
                                         (collection) {
                                           return Offstage(
@@ -224,14 +269,10 @@ class _LinksState extends State<Links> {
                                       )
                                     ],
                                     selectedOptionBuilder: (context, value) =>
-                                        Text(collections[value]!),
-                                  ),
-                                  ShadSwitchFormField(
-                                    id: 'published',
-                                    label: const Text('Publicado'),
-                                    initialValue: newLinkPublished,
+                                        Text(collections[value] ??
+                                            "Sin colección"),
                                     onChanged: (value) => setState(() {
-                                      newLinkPublished = value;
+                                      newLinkCollectionId = int.parse(value);
                                     }),
                                   ),
                                 ],
@@ -287,12 +328,15 @@ class _LinksState extends State<Links> {
                     title: Text(link.title),
                     description: Text(link.description),
                   ),
-                  onLongPress: () {
+                  onLongPress: () async {
+                    await loadCollections();
+
                     editingLinkTitle = link.title;
                     editingLinkDescription = link.description;
                     editingLinkUrl = link.url;
                     editingLinkPublished = link.published;
-                    editingLinkCollectionId = link.collectionId;
+                    editingLinkCollectionId =
+                        link.collectionId == null ? -1 : link.collectionId!;
 
                     showShadDialog(
                       context: context,
@@ -306,8 +350,8 @@ class _LinksState extends State<Links> {
                           width: 375,
                           padding: const EdgeInsets.symmetric(vertical: 20),
                           child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.end,
+                            // mainAxisSize: MainAxisSize.min,
+                            // crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               ShadForm(
                                 key: formKey,
@@ -362,32 +406,77 @@ class _LinksState extends State<Links> {
                                         return null;
                                       },
                                     ),
-                                    ShadSwitchFormField(
-                                      id: 'published',
-                                      label: const Text('Publicado'),
-                                      initialValue: editingLinkPublished,
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 2),
+                                            child: ShadSwitchFormField(
+                                              id: 'published',
+                                              label: const Text('Publicado'),
+                                              initialValue:
+                                                  editingLinkPublished,
+                                              onChanged: (value) =>
+                                                  setState(() {
+                                                editingLinkPublished = value;
+                                              }),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 4, bottom: 4, top: 8),
+                                            child: Text(
+                                              'Colección',
+                                              style: ShadTheme.of(context)
+                                                  .textTheme
+                                                  .small,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    ShadSelect<String>.withSearch(
+                                      minWidth: 350,
+                                      placeholder: const Text(
+                                          'Selecciona una colección...'),
+                                      onSearchChanged: (value) => setState(
+                                          () => collectionsSearch = value),
+                                      searchPlaceholder:
+                                          const Text('Buscar colección'),
+                                      initialValue:
+                                          editingLinkCollectionId.toString(),
+                                      options: [
+                                        const ShadOption(
+                                            value: "-1",
+                                            child: Text("Sin colección")),
+                                        ...collections.entries.map(
+                                          (collection) {
+                                            return Offstage(
+                                              offstage: !filteredCollections
+                                                  .containsKey(collection.key),
+                                              child: ShadOption(
+                                                value: collection.key,
+                                                child: Text(collection.value),
+                                              ),
+                                            );
+                                          },
+                                        )
+                                      ],
+                                      selectedOptionBuilder: (context, value) =>
+                                          Text(collections[value] ??
+                                              "Sin colección"),
                                       onChanged: (value) => setState(() {
-                                        editingLinkPublished = value;
+                                        editingLinkCollectionId =
+                                            int.parse(value);
                                       }),
                                     ),
-                                    // ShadSelectFormField(
-                                    //   id: 'collectionId',
-                                    //   label: const Text('Colección'),
-                                    //   onChanged: (value) => setState(() {
-                                    //     editingLinkCollectionId = value as int;
-                                    //   }),
-                                    //   initialValue: editingLinkCollectionId,
-                                    //   options: [],
-                                    //   selectedOptionBuilder: (option) =>
-                                    //       Container(
-                                    //     padding: const EdgeInsets.all(8),
-                                    //     decoration: BoxDecoration(
-                                    //       color: Colors.grey[200],
-                                    //       borderRadius: BorderRadius.circular(4),
-                                    //     ),
-                                    //     child: Text(option.toString()),
-                                    //   ),
-                                    // ),
                                   ],
                                 ),
                               ),
@@ -416,14 +505,14 @@ class _LinksState extends State<Links> {
                                   ),
                                 ),
                                 actions: [
+                                  ShadButton.destructive(
+                                    text: const Text('Eliminar'),
+                                    onPressed: () => deleteLink(link.id),
+                                  ),
                                   ShadButton.ghost(
                                     text: const Text('Cancelar'),
                                     onPressed: () =>
                                         Navigator.of(context).pop(false),
-                                  ),
-                                  ShadButton.destructive(
-                                    text: const Text('Eliminar'),
-                                    onPressed: () => deleteLink(link.id),
                                   ),
                                 ],
                               ),
