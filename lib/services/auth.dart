@@ -32,8 +32,32 @@ Future<User> authLogin(String email, String password) async {
   var token = body['token'];
   var id = int.parse(body['id']);
   var username = body['username'];
+  var role = body['role'];
 
-  var user = User(id, username, email, token);
+  var user = User(id, username, email, token, role);
+
+  return user;
+}
+
+Future<User> authRefresh(String token) async {
+  var response = await http.get(
+    Uri.parse('${config['backend_url']}/api/auth/refresh'),
+    headers: {"Content-Type": "application/json"},
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception("${response.statusCode} ${response.body}");
+  }
+
+  var body = jsonDecode(utf8.decode(response.bodyBytes));
+
+  var token = body['token'];
+  var id = int.parse(body['id']);
+  var username = body['username'];
+  var email = body['email'];
+  var role = body['role'];
+
+  var user = User(id, username, email, token, role);
 
   return user;
 }

@@ -6,9 +6,12 @@ import 'package:stash_app/components/collections.dart';
 import 'package:stash_app/components/links.dart';
 import 'package:stash_app/components/scrollable.dart';
 import 'package:stash_app/config.dart';
+import 'package:stash_app/services/auth.dart';
+import 'package:stash_app/services/payments.dart';
 import 'package:stash_app/store.dart';
 import 'package:typewritertext/v3/typewriter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,6 +21,34 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      () async {
+        final user = context.get<Signal<User?>>();
+
+        if (user.value == null) {
+          return;
+        }
+
+        try {
+          user.value = await authRefresh(user.value!.token);
+        } catch (e) {
+          user.value = null;
+          ShadToaster.of(context).show(
+            const ShadToast(
+              title: Text('El servidor no esta disponible.'),
+              description: Text(
+                  'Intentalo mas tarde o ponte en contacto con el administrador en: vgarciaf@hey.com'),
+            ),
+          );
+          context.go('/login');
+        }
+      }();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = context.get<Signal<User?>>();
@@ -93,6 +124,39 @@ class _HomeScreenState extends State<HomeScreen> {
                                   initialValue: user.value?.email,
                                   enabled: false,
                                 ),
+                                if (user.value?.role == 'free') ...[
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'Suscripciones',
+                                    style: ShadTheme.of(context).textTheme.h4,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  ShadButton(
+                                    text: const Text(
+                                        'Suscribirse al plan Básico - 1 €/mes'),
+                                    onPressed: () => startSubscriptionPayment(
+                                        user.value as User, 1),
+                                  ),
+                                  ShadButton(
+                                    text: const Text(
+                                        'Suscribirse al plan Estandar - 3 €/mes'),
+                                    onPressed: () => startSubscriptionPayment(
+                                        user.value as User, 2),
+                                  ),
+                                  ShadButton(
+                                      text: const Text(
+                                          'Suscribirse al plan Premium - 6 €/mes'),
+                                      onPressed: () async {
+                                        await startSubscriptionPayment(
+                                            user.value as User, 3);
+
+                                        await Future.delayed(
+                                            const Duration(seconds: 5));
+
+                                        user.value = await authRefresh(
+                                            user.value!.token);
+                                      }),
+                                ]
                               ]),
                         ),
                         actions: [
