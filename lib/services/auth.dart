@@ -39,10 +39,13 @@ Future<User> authLogin(String email, String password) async {
   return user;
 }
 
-Future<User> authRefresh(String token) async {
+Future<User> authRefresh(String previousToken) async {
   var response = await http.get(
     Uri.parse('${config['backend_url']}/api/auth/refresh'),
-    headers: {"Content-Type": "application/json"},
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $previousToken",
+    },
   );
 
   if (response.statusCode != 200) {

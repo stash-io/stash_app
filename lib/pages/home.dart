@@ -21,31 +21,47 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      () async {
-        final user = context.get<Signal<User?>>();
+  Future<void> subscribeToTier(int tier) async {
+    final user = context.get<Signal<User?>>();
+    final type = tier == 1
+        ? 'Básico'
+        : tier == 2
+            ? 'Estandar'
+            : 'Premium';
 
-        if (user.value == null) {
-          return;
-        }
+    await startSubscriptionPayment(user.value as User, tier);
 
-        try {
-          user.value = await authRefresh(user.value!.token);
-        } catch (e) {
-          user.value = null;
-          ShadToaster.of(context).show(
-            const ShadToast(
-              title: Text('El servidor no esta disponible.'),
-              description: Text(
-                  'Intentalo mas tarde o ponte en contacto con el administrador en: vgarciaf@hey.com'),
-            ),
-          );
-          context.go('/login');
-        }
-      }();
+    showShadDialog(
+      context: context,
+      builder: (context) => ShadDialog(
+        closeIcon: null,
+        title: const Text('Procesando pago'),
+        description: const Text(
+            'Estamos procesando tu pago. Por favor, espera un momento...'),
+        content: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.sizeOf(context).width * 0.6,
+          ),
+          child: const ShadProgress(),
+        ),
+      ),
+    );
+
+    await Future.delayed(const Duration(seconds: 3), () async {
+      var newUser = await authRefresh(user.value!.token);
+      setState(() {
+        user.value = newUser;
+      });
+      Navigator.of(context).pop(false);
+      Navigator.of(context).pop(false);
+
+      ShadToaster.of(context).show(
+        ShadToast(
+          title: Text('Tu subscripción $type se ha activado correctamente.'),
+          description: const Text(
+              '¡Gracias por confiar en nosotros! Ahora puedes disfrutar de todas las funcionalidades de la aplicación.'),
+        ),
+      );
     });
   }
 
@@ -110,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 20),
                           child: Column(
                               mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 ShadInputFormField(
                                   id: 'username',
@@ -124,39 +140,38 @@ class _HomeScreenState extends State<HomeScreen> {
                                   initialValue: user.value?.email,
                                   enabled: false,
                                 ),
-                                if (user.value?.role == 'free') ...[
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    'Suscripciones',
-                                    style: ShadTheme.of(context).textTheme.h4,
-                                  ),
-                                  const SizedBox(height: 8),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Gestiona tu suscripción',
+                                  style: ShadTheme.of(context).textTheme.large,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  '''Plan actual: ${user.value?.role == 'free' ? 'Plan gratuito' : user.value?.role == 'tier1' ? 'Básico' : user.value?.role == 'tier2' ? 'Estandar' : 'Premium'}''',
+                                  style: ShadTheme.of(context).textTheme.muted,
+                                ),
+                                const SizedBox(height: 12),
+                                if (user.value?.role == 'free')
+                                  const Text(
+                                      'Actualmente no tienes ninguna suscripción activa.'),
+                                if (user.value?.role != 'tier1')
                                   ShadButton(
                                     text: const Text(
                                         'Suscribirse al plan Básico - 1 €/mes'),
-                                    onPressed: () => startSubscriptionPayment(
-                                        user.value as User, 1),
+                                    onPressed: () => subscribeToTier(1),
                                   ),
+                                if (user.value?.role != 'tier2')
                                   ShadButton(
                                     text: const Text(
                                         'Suscribirse al plan Estandar - 3 €/mes'),
-                                    onPressed: () => startSubscriptionPayment(
-                                        user.value as User, 2),
+                                    onPressed: () => subscribeToTier(2),
                                   ),
+                                if (user.value?.role != 'tier3')
                                   ShadButton(
-                                      text: const Text(
-                                          'Suscribirse al plan Premium - 6 €/mes'),
-                                      onPressed: () async {
-                                        await startSubscriptionPayment(
-                                            user.value as User, 3);
-
-                                        await Future.delayed(
-                                            const Duration(seconds: 5));
-
-                                        user.value = await authRefresh(
-                                            user.value!.token);
-                                      }),
-                                ]
+                                    text: const Text(
+                                        'Suscribirse al plan Premium - 6 €/mes'),
+                                    onPressed: () => subscribeToTier(3),
+                                  ),
                               ]),
                         ),
                         actions: [

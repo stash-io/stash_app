@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:http/http.dart' as http;
@@ -17,7 +19,9 @@ Future<String> paymentsCreateIntent(String token, int tier) async {
     throw Exception("${response.statusCode} ${response.body}");
   }
 
-  final clientSecret = response.body;
+  var body = jsonDecode(utf8.decode(response.bodyBytes));
+  var clientSecret = body['clientSecret'];
+
   return clientSecret;
 }
 

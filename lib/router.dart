@@ -9,6 +9,7 @@ import 'package:stash_app/pages/home.dart';
 import 'package:stash_app/pages/login.dart';
 import 'package:stash_app/pages/onboarding.dart';
 import 'package:stash_app/pages/register.dart';
+import 'package:stash_app/services/auth.dart';
 import 'package:stash_app/store.dart';
 
 Future<void> loadUserFromStorage(user) async {
@@ -18,7 +19,19 @@ Future<void> loadUserFromStorage(user) async {
   }
 
   final userDecoded = User.fromJson(jsonDecode(userEncoded));
-  user.value = userDecoded;
+
+  try {
+    print(userDecoded.token);
+    final refreshedUser = await authRefresh(userDecoded.token);
+    if (refreshedUser == null) {
+      return;
+    }
+
+    user.value = refreshedUser;
+  } catch (e) {
+    print(e);
+    return;
+  }
 }
 
 Future<String?> goToOnboardingIfNotLoggedIn(
