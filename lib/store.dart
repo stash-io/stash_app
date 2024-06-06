@@ -11,15 +11,18 @@ class User {
   String email;
   String token;
   String role;
+  int? reminderDayOfWeek;
 
-  User(this.id, this.username, this.email, this.token, this.role);
+  User(this.id, this.username, this.email, this.token, this.role,
+      this.reminderDayOfWeek);
 
   User.fromJson(Map<String, dynamic> json)
       : id = json['id'],
         username = json['username'],
         email = json['email'],
         token = json['token'],
-        role = json['role'];
+        role = json['role'],
+        reminderDayOfWeek = json['reminderDayOfWeek'];
 
   Map<String, dynamic> toJson() {
     return {
@@ -28,6 +31,7 @@ class User {
       'email': email,
       'token': token,
       'role': role,
+      'reminderDayOfWeek': reminderDayOfWeek,
     };
   }
 }
@@ -48,6 +52,7 @@ class Store extends StatelessWidget {
         ),
       ],
       builder: (context) {
+        // Descomentar para limpiar el usuario al iniciar la app
         // SharedPreferences.getInstance().then(
         //   (prefs) {
         //     prefs.clear();

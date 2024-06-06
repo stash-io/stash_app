@@ -33,8 +33,9 @@ Future<User> authLogin(String email, String password) async {
   var id = int.parse(body['id']);
   var username = body['username'];
   var role = body['role'];
+  var reminderDayOfWeek = body['reminderDayOfWeek'];
 
-  var user = User(id, username, email, token, role);
+  var user = User(id, username, email, token, role, reminderDayOfWeek);
 
   return user;
 }
@@ -59,8 +60,26 @@ Future<User> authRefresh(String previousToken) async {
   var username = body['username'];
   var email = body['email'];
   var role = body['role'];
+  var reminderDayOfWeek = body['reminderDayOfWeek'];
 
-  var user = User(id, username, email, token, role);
+  var user = User(id, username, email, token, role, reminderDayOfWeek);
 
   return user;
+}
+
+Future<void> authUpdateReminderDayOfWeek(
+  String token,
+  int? reminderDayOfWeek,
+) async {
+  var response =
+      await http.put(Uri.parse('${config['backend_url']}/api/auth/reminders'),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer $token",
+          },
+          body: json.encode({"dayOfWeek": reminderDayOfWeek}));
+
+  if (response.statusCode != 200) {
+    throw Exception("${response.statusCode} ${response.body}");
+  }
 }

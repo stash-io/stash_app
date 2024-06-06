@@ -21,6 +21,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final daysOfWeek = {
+    1: 'Lunes',
+    2: 'Martes',
+    3: 'Miércoles',
+    4: 'Jueves',
+    5: 'Viernes',
+    6: 'Sábado',
+    7: 'Domingo',
+  };
+
   Future<void> subscribeToTier(int tier) async {
     final user = context.get<Signal<User?>>();
     final type = tier == 1
@@ -140,6 +150,41 @@ class _HomeScreenState extends State<HomeScreen> {
                                   initialValue: user.value?.email,
                                   enabled: false,
                                 ),
+                                ShadSelectFormField<String>(
+                                  minWidth: 350,
+                                  id: 'reminderDayOfWeek',
+                                  label: const Text(
+                                      'Día de la semana de recordatorio'),
+                                  initialValue: user.value?.reminderDayOfWeek
+                                          .toString() ??
+                                      'null',
+                                  placeholder:
+                                      const Text("Selecciona dia de la semana"),
+                                  options: [
+                                    const ShadOption(
+                                        value: 'null',
+                                        child: Text('Desactivado')),
+                                    ...daysOfWeek.entries.map((e) => ShadOption(
+                                        value: e.key.toString(),
+                                        child: Text(e.value)))
+                                  ],
+                                  selectedOptionBuilder: (context, value) =>
+                                      Text(value == 'null'
+                                          ? 'Desactivado'
+                                          : daysOfWeek[int.parse(value)]!),
+                                  onChanged: (String? value) => setState(() {
+                                    if (value == 'null') {
+                                      user.value!.reminderDayOfWeek = null;
+                                    } else {
+                                      user.value!.reminderDayOfWeek =
+                                          int.parse(value!);
+                                    }
+
+                                    authUpdateReminderDayOfWeek(
+                                        user.value!.token,
+                                        user.value!.reminderDayOfWeek);
+                                  }),
+                                ),
                                 const SizedBox(height: 16),
                                 Text(
                                   'Gestiona tu suscripción',
@@ -151,9 +196,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                   style: ShadTheme.of(context).textTheme.muted,
                                 ),
                                 const SizedBox(height: 12),
-                                if (user.value?.role == 'free')
-                                  const Text(
-                                      'Actualmente no tienes ninguna suscripción activa.'),
                                 if (user.value?.role != 'tier1')
                                   ShadButton(
                                     text: const Text(
