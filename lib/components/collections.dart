@@ -22,11 +22,16 @@ class _CollectionsState extends State<Collections> {
 
   @override
   Widget build(BuildContext context) {
+    final formKeyEdit = GlobalKey<ShadFormState>();
     final user = context.get<Signal<User?>>();
 
     String newCollectionTitle = "";
     String newCollectionDescription = "";
     bool newCollectionPublished = false;
+
+    String editingCollectionTitle = "";
+    String editingCollectionDescription = "";
+    bool editingCollectionPublished = false;
 
     Future<void> createNewCollection() async {
       await collectionsCreate(user.value?.token as String, newCollectionTitle,
@@ -34,6 +39,43 @@ class _CollectionsState extends State<Collections> {
 
       if (mounted) {
         Navigator.of(context).pop(false);
+        setState(() {});
+      }
+    }
+
+    Future<void> updateCollection(int id) async {
+      if (!formKeyEdit.currentState!.saveAndValidate()) {
+        return;
+      }
+
+      await collectionsUpdate(
+        user.value?.token as String,
+        id,
+        editingCollectionTitle,
+        editingCollectionDescription,
+        editingCollectionPublished,
+      );
+
+      if (mounted) {
+        Navigator.of(context).pop(false);
+        setState(() {});
+      }
+    }
+
+    Future<void> deleteCollection(int id) async {
+      await collectionsDelete(context.get<Signal<User?>>().value!.token, id);
+
+      if (mounted) {
+        ShadToaster.of(context).show(
+          const ShadToast(
+            title: Text('Colección eliminada.'),
+            description: Text('La colección ha sido eliminada correctamente.'),
+          ),
+        );
+
+        Navigator.of(context).pop(false);
+        Navigator.of(context).pop(false);
+        setState(() {});
         setState(() {});
       }
     }
@@ -179,6 +221,127 @@ class _CollectionsState extends State<Collections> {
                     title: Text(collection.title),
                     description: Text(collection.description),
                   ),
+                  onLongPress: () async {
+                    editingCollectionTitle = collection.title;
+                    editingCollectionDescription = collection.description;
+                    editingCollectionPublished = collection.published;
+
+                    showShadDialog(
+                      context: context,
+                      builder: (context) => ShadDialog(
+                        title: const Text(
+                            textAlign: TextAlign.left, 'Editar link'),
+                        description: const Text(
+                            textAlign: TextAlign.left,
+                            "Aqui puedes editar el link o borrarlo."),
+                        content: Container(
+                          width: 375,
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          child: Column(
+                            // mainAxisSize: MainAxisSize.min,
+                            // crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              ShadForm(
+                                key: formKeyEdit,
+                                child: Column(
+                                  children: [
+                                    ShadInputFormField(
+                                      id: 'title',
+                                      label: const Text('Titulo'),
+                                      initialValue: collection.title,
+                                      onChanged: (value) => setState(() {
+                                        editingCollectionTitle = value;
+                                      }),
+                                      validator: (value) {
+                                        if (value.isEmpty) {
+                                          return 'Por favor, introduce un título.';
+                                        }
+
+                                        return null;
+                                      },
+                                    ),
+                                    ShadInputFormField(
+                                      id: 'description',
+                                      label: const Text('Descripción'),
+                                      initialValue: collection.description,
+                                      onChanged: (value) => setState(() {
+                                        editingCollectionDescription = value;
+                                      }),
+                                      validator: (value) {
+                                        if (value.isEmpty) {
+                                          return 'Por favor, introduce una descripción.';
+                                        }
+
+                                        return null;
+                                      },
+                                    ),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 2),
+                                            child: ShadSwitchFormField(
+                                              id: 'published',
+                                              label: const Text('Publicado'),
+                                              initialValue:
+                                                  collection.published,
+                                              onChanged: (value) =>
+                                                  setState(() {
+                                                editingCollectionPublished =
+                                                    value;
+                                              }),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        actions: [
+                          ShadButton(
+                            text: const Text('Guardar'),
+                            onPressed: () => updateCollection(collection.id),
+                          ),
+                          ShadButton.destructive(
+                            text: const Text("Borrar"),
+                            onPressed: () => showShadDialog(
+                              context: context,
+                              builder: (context) => ShadDialog.alert(
+                                title: const Text(
+                                  '¿Estas seguro?',
+                                  textAlign: TextAlign.left,
+                                ),
+                                description: const Padding(
+                                  padding: EdgeInsets.only(bottom: 8),
+                                  child: Text(
+                                    'Esta acción es irreversible. ¿Estás seguro de que quieres eliminar este link?',
+                                    textAlign: TextAlign.left,
+                                  ),
+                                ),
+                                actions: [
+                                  ShadButton.destructive(
+                                    text: const Text('Eliminar'),
+                                    onPressed: () =>
+                                        deleteCollection(collection.id),
+                                  ),
+                                  ShadButton.ghost(
+                                    text: const Text('Cancelar'),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(false),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ),
             )

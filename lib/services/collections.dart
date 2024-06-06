@@ -119,6 +119,27 @@ Future<Collection> collectionsFind(String token, int id) async {
   return body.collection;
 }
 
+Future<void> collectionsUpdate(String token, int id, String title,
+    String description, bool published) async {
+  var response = await http.put(
+    Uri.parse('${config['backend_url']}/api/collections/update'),
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token"
+    },
+    body: json.encode({
+      "id": id,
+      "title": title,
+      "description": description,
+      "published": published
+    }),
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception("${response.statusCode} ${response.body}");
+  }
+}
+
 Future<void> collectionsDelete(String token, int id) async {
   var response = await http.delete(
     Uri.parse('${config['backend_url']}/api/collections/$id'),
