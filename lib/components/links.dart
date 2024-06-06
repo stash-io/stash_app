@@ -77,8 +77,13 @@ class _LinksState extends State<Links> {
         return;
       }
 
-      await linksCreate(user.value?.token as String, newLinkTitle,
-          newLinkDescription, newLinkUrl, newLinkPublished);
+      await linksCreate(
+          user.value?.token as String,
+          newLinkTitle,
+          newLinkDescription,
+          newLinkUrl,
+          newLinkPublished,
+          newLinkCollectionId);
 
       if (mounted) {
         Navigator.of(context).pop(false);

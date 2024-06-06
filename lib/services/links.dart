@@ -39,7 +39,7 @@ class Link {
 }
 
 Future<void> linksCreate(String token, String title, String description,
-    String url, bool published) async {
+    String url, bool published, int? collectionId) async {
   var response = await http.post(
       Uri.parse('${config['backend_url']}/api/links/create'),
       headers: {
@@ -51,7 +51,7 @@ Future<void> linksCreate(String token, String title, String description,
         "description": description,
         "url": url,
         "published": published,
-        "collectionId": null
+        "collectionId": collectionId
       }));
 
   if (response.statusCode != 201) {
