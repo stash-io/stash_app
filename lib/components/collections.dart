@@ -27,7 +27,7 @@ class _CollectionsState extends State<Collections> {
 
     String newCollectionTitle = "";
     String newCollectionDescription = "";
-    bool newCollectionPublished = false;
+    bool newCollectionPublished = true;
 
     String editingCollectionTitle = "";
     String editingCollectionDescription = "";
@@ -193,6 +193,23 @@ class _CollectionsState extends State<Collections> {
                               onChanged: (value) => setState(() {
                                 newCollectionDescription = value;
                               }),
+                            ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 2),
+                                    child: ShadSwitchFormField(
+                                      id: 'published',
+                                      label: const Text('Publicado'),
+                                      initialValue: newCollectionPublished,
+                                      onChanged: (value) => setState(() {
+                                        newCollectionPublished = value;
+                                      }),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ]),
                     ),

@@ -63,7 +63,7 @@ class _LinksState extends State<Links> {
     String newLinkTitle = "";
     String newLinkDescription = "";
     String newLinkUrl = "";
-    bool newLinkPublished = false;
+    bool newLinkPublished = true;
     int? newLinkCollectionId;
 
     String editingLinkTitle = "";
