@@ -60,7 +60,7 @@ Future<User> authRefresh(String previousToken) async {
   var username = body['username'];
   var email = body['email'];
   var role = body['role'];
-  var reminderDayOfWeek = body['reminderDayOfWeek'];
+  var reminderDayOfWeek = int.parse(body['reminderDayOfWeek']);
 
   var user = User(id, username, email, token, role, reminderDayOfWeek);
 
