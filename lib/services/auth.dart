@@ -33,7 +33,9 @@ Future<User> authLogin(String email, String password) async {
   var id = int.parse(body['id']);
   var username = body['username'];
   var role = body['role'];
-  var reminderDayOfWeek = body['reminderDayOfWeek'];
+  var reminderDayOfWeek = body['reminderDayOfWeek'] == "null"
+      ? null
+      : int.parse(body['reminderDayOfWeek']);
 
   var user = User(id, username, email, token, role, reminderDayOfWeek);
 
@@ -60,7 +62,9 @@ Future<User> authRefresh(String previousToken) async {
   var username = body['username'];
   var email = body['email'];
   var role = body['role'];
-  var reminderDayOfWeek = int.parse(body['reminderDayOfWeek']);
+  var reminderDayOfWeek = body['reminderDayOfWeek'] == "null"
+      ? null
+      : int.parse(body['reminderDayOfWeek']);
 
   var user = User(id, username, email, token, role, reminderDayOfWeek);
 
